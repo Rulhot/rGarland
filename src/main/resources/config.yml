@@ -1,0 +1,45 @@
+settings:
+  metrics: true
+  update-check: true
+
+command:
+  main: garland
+  aliases: [ garlands ]
+
+limits:
+  per-player: 100 # сколько пролётов может повесить один игрок, 1-10000
+  max-length: 16 # самый длинный пролёт в блоках, 1-48
+
+garland:
+  night-only: false # true: лампы горят только ночью, днём гаснут
+  blink-seconds: 0.5 # скорость мигания, меньше = быстрее, 0.1-10
+  wind:
+    angle-degrees: 6 # насколько сильно качается пролёт на ветру, 0 выключает, 0-45
+    period-seconds: 4 # сколько длится одно качание туда и обратно, 0.5-30
+
+performance:
+  view-distance: 48 # с какого расстояния игрок видит гирлянду, 8-128
+  detail-distance: 24 # ближе этого видны патроны, крючки, свет и качание, 0-128
+  wire-step: 0.35 # длина одного куска провода, больше = меньше нагрузки, 0.1-4
+  bulb-spacing: 0.5 # расстояние между лампами, больше = меньше ламп, 0.2-4
+  animation-ticks: 4 # как часто обновляется мигание, 20 тиков = 1 секунда, 1-40
+  swing-ticks: 8 # как часто отправляется качание на ветру, 2-100
+  viewer-check-ticks: 20 # как часто искать игроков рядом с гирляндой, 5-200
+  preview-ticks: 4 # как часто обновляется превью у игрока с гирляндой в руке, 1-40
+  light-update-ticks: 8 # как часто свет вокруг ламп повторяет мигание, 2-200
+
+sounds: # key: звук Minecraft, volume: громкость 0-1, pitch: высота 0.5-2
+  hang: # пролёт повешен или поставлена точка
+    key: "minecraft:block.chain.place"
+    volume: 0.8
+    pitch: 1.4
+  remove: # пролёт снят
+    key: "minecraft:block.chain.break"
+    volume: 0.8
+    pitch: 1.2
+  switch: # смена ламп или мигания клавишей F
+    key: "minecraft:block.note_block.chime"
+    volume: 0.5
+    pitch: 1.6
+
+config-version: 1 #не трогать!!!

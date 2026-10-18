@@ -1,0 +1,69 @@
+prefix: "<gradient:#FFD54A:#FFF0A8><shadow:#3F330D:1>rGarland</shadow></gradient> <dark_gray>»</dark_gray>"
+
+not-ready: "{prefix} <white>Плагин ещё загружается или в конфиге ошибка. Проверь консоль и сделай <#FFD54A>/{command} reload</#FFD54A>."
+player-not-found: "{prefix} <white>Игрок <#FFD54A>{player}</#FFD54A> не найден."
+invalid-number: "{prefix} <white>Номера <#FFD54A>{value}</#FFD54A> нет. Есть от 1 до <#FFD54A>{max}</#FFD54A>."
+
+help:
+  - "{prefix} <white>Команды:"
+  - " <white>/{command} give [игрок] [кол-во] <dark_gray>»</dark_gray> <white>выдать гирлянду"
+  - " <white>/{command} list [игрок] [страница] <dark_gray>»</dark_gray> <white>список гирлянд игрока"
+  - " <white>/{command} remove [игрок] [номер] <dark_gray>»</dark_gray> <white>снять гирлянду, номер из list"
+  - " <white>/{command} reload <dark_gray>»</dark_gray> <white>перезагрузить конфигурацию"
+  - " <white>/{command} help <dark_gray>»</dark_gray> <white>показать эту справку"
+
+give:
+  usage: "{prefix} <white>Формат команды: <#FFD54A>/{command} give [игрок] [кол-во]"
+  sender: "{prefix} <white>Игрок <#FFD54A>{player}</#FFD54A> получил гирлянду <gray>x{amount}"
+  target: "{prefix} <white>Ты получил: {item} <gray>x{amount}<white>. Нажми ПКМ по блоку, чтобы повесить."
+
+reload:
+  done: "{prefix} <white>Конфигурация перезагружена."
+  busy: "{prefix} <white>Перезагрузка уже идёт. Подожди."
+  failed: "{prefix} <white>Конфигурация не перезагружена, работает прежняя. Ошибка записана в консоль."
+
+list:
+  usage: "{prefix} <white>Формат команды: <#FFD54A>/{command} list [игрок]"
+  empty: "{prefix} <white>У игрока <#FFD54A>{player}</#FFD54A> нет гирлянд."
+  header: "{prefix} <white>Гирлянды игрока <#FFD54A>{player}</#FFD54A>: {count}"
+  line: " <gray>{number}. <white>{name} <gray>{world} <#FFD54A>{x} {y} {z}"
+  hover: "<white>Нажми, чтобы телепортироваться"
+  footer: " {previous} <gray>Страница <#FFD54A>{page}</#FFD54A> из <#FFD54A>{pages}</#FFD54A> {next}"
+  previous: "<#FFD54A><hover:show_text:'<white>Предыдущая страница'>« Назад</hover>"
+  previous-off: "<dark_gray>« Назад"
+  next: "<#FFD54A><hover:show_text:'<white>Следующая страница'>Вперёд »</hover>"
+  next-off: "<dark_gray>Вперёд »"
+
+remove:
+  usage: "{prefix} <white>Формат команды: <#FFD54A>/{command} remove [игрок] [номер]</#FFD54A>. Номер смотри в <#FFD54A>/{command} list"
+  done: "{prefix} <white>Гирлянда <#FFD54A>{number}</#FFD54A> игрока <#FFD54A>{player}</#FFD54A> снята."
+
+garland:
+  no-permission: "<white>У тебя нет права вешать гирлянды."
+  look-at-block: "<white>Наведи прицел на стену или блок."
+  first-point: "<white>Начало стоит. <#FFD54A>ПКМ</#FFD54A> по второй точке, <#FFD54A>ЛКМ</#FFD54A> отменить."
+  continue: "<white>Тянешь от этой точки. <#FFD54A>ПКМ</#FFD54A> по второй точке, <#FFD54A>ЛКМ</#FFD54A> отменить."
+  hung: "<white>Пролёт повешен. Снять его: <#FFD54A>Shift + ЛКМ</#FFD54A> по проводу."
+  cancelled: "<white>Начало гирлянды отменено."
+  taken-back: "<white>Пролёт снят, гирлянда вернулась в инвентарь."
+  taken: "<white>Пролёт снят."
+  protected: "<white>Здесь чужая территория. Вешать гирлянду можно только там, где ты строишь."
+  too-close: "<white>Пролёт задевает другую гирлянду. Выбери точку дальше или под другим углом."
+  bad-length: "{prefix} <white>Пролёт должен быть не длиннее <#FFD54A>{max}</#FFD54A> блоков. Выбери точку ближе."
+  limit: "{prefix} <white>У тебя уже <#FFD54A>{max}</#FFD54A> пролётов. Сними лишние через <#FFD54A>ЛКМ</#FFD54A> по точке."
+  removed: "<white>Снято пролётов: <#FFD54A>{count}</#FFD54A>"
+  nothing: "<white>Наведи прицел на светящуюся точку гирлянды, чтобы снять её."
+  palette: "<white>Лампы: {name} <dark_gray>»</dark_gray> <white>следующие через <#FFD54A>F</#FFD54A>"
+  palette-applied: "<white>Гирлянда перекрашена: {name}"
+  mode: "<white>Мигание: {name} <dark_gray>»</dark_gray> <white>следующее через <#FFD54A>Shift + F</#FFD54A>"
+  mode-applied: "<white>Мигание гирлянды: {name}"
+
+modes:
+  shift: "<#FFD54A>перелив"
+  chase: "<#FFD54A>бегущий огонь"
+  wave: "<#FFD54A>волна"
+  twinkle: "<#FFD54A>мерцание"
+  breathe: "<#FFD54A>дыхание"
+  steady: "<#FFD54A>без мигания"
+
+config-version: 1 #не трогать!!!

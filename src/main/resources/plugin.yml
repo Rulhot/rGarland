@@ -1,0 +1,9 @@
+name: rGarland
+version: '1.0'
+main: ru.rulhot.rGarland.RGarland
+api-version: '1.21.4'
+load: POSTWORLD
+folia-supported: true
+depend: [ packetevents ]
+softdepend: [ WorldGuard, GriefPrevention, CakeRegionsPlus ]
+authors: [ Rulhot ]

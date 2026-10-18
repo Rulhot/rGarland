@@ -1,0 +1,27 @@
+package ru.rulhot.rGarland.command.sub;
+
+import com.mojang.brigadier.Command;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.command.brigadier.Commands;
+import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
+import ru.rulhot.rGarland.command.SubCommand;
+import ru.rulhot.rGarland.manager.ConfigManager;
+
+@RequiredArgsConstructor
+public final class HelpSubCommand implements SubCommand {
+
+    private static final @NotNull String NAME = "help";
+
+    private final @NotNull ConfigManager config;
+
+    @Override
+    public @NotNull LiteralArgumentBuilder<CommandSourceStack> node() {
+        return Commands.literal(NAME)
+                .executes(context -> {
+                    config.send(context.getSource().getSender(), "help");
+                    return Command.SINGLE_SUCCESS;
+                });
+    }
+}

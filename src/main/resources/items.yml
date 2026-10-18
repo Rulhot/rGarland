@@ -1,0 +1,65 @@
+item:
+  material: STRING
+  name: "<#FFD54A>Гирлянда"
+  lore:
+    - ""
+    - " <#FFD54A>Гирлянда <white>вешает один пролёт между двумя точками."
+    - ""
+    - " <#FFD54A><u>▌</u> <white>ПКМ: начало, ещё ПКМ: конец пролёта"
+    - " <#FFD54A><u>▌</u> <white>ПКМ по точке: тянуть от неё"
+    - " <#FFD54A><u>▌</u> <white>ЛКМ: отменить начало или снять пролёт"
+    - " <#FFD54A><u>▌</u> <white>F: сменить лампы"
+    - " <#FFD54A><u>▌</u> <white>Shift + F: сменить мигание"
+    - " <#FFD54A>▌ <white>Shift + ЛКМ по своему проводу: снять и вернуть"
+    - ""
+    - " <white>Наведи прицел на точку и нажми F,"
+    - " <white>чтобы перекрасить всю гирлянду."
+    - ""
+
+blocks:
+  wire: BLACK_CONCRETE # блок провода
+  socket: GRAY_CANDLE # блок патрона над лампой
+  hook: GRAY_CONCRETE # блок крючка на концах пролёта
+
+list: # наборы ламп, переключаются клавишей F в этом порядке
+  1:
+    name: "<#FF6B6B>Новогодняя" # название набора в подсказке над хотбаром
+    bulbs: # лампы по очереди: ссылка на текстуру головы, Value с minecraft-heads.com, предмет или блок
+      orange: "https://textures.minecraft.net/texture/c0dac2501c9e756767f6943323ad5955b5a975bb09be12364ef80ea3f1ca7b06"
+      red: "https://textures.minecraft.net/texture/2bc65b659eafa37df6c4b11dde89073db71a5f5b22513882013e101fe466399"
+      blue: "https://textures.minecraft.net/texture/86f901bbde8cd67520fa0c7ae461ee7ca66ce3c4c481cd5c12fb43712eea6b63"
+      green: "https://textures.minecraft.net/texture/b605c66347f327c5eed27672d7a0e347f4e36c006353c91b78935ba28116504"
+    size: 0.3 # размер лампы, одно число или [ x, y, z ], 0.01-2
+    drop: 0.2 # на сколько лампа висит ниже провода
+    light: 10 # сила света вокруг лампы, 0 выключает, 0-15
+    socket: true # показывать патрон над лампой
+  2:
+    name: "<#FFC46B>Тёплая"
+    bulbs: [ OCHRE_FROGLIGHT, SHROOMLIGHT, GLOWSTONE ]
+    size: 0.16
+    drop: 0.15
+    light: 12
+    socket: true
+  3:
+    name: "<#FFB84D>Фонарики"
+    bulbs: [ "lantern[hanging=true]", "soul_lantern[hanging=true]" ] # в скобках состояние блока, hanging=true: висячий фонарь
+    size: 0.35
+    drop: 0.18
+    light: 13
+    socket: false
+  4:
+    name: "<#A8E6FF>Сосульки"
+    bulbs: [ LIGHT_BLUE_STAINED_GLASS, WHITE_STAINED_GLASS ]
+    size: [ 0.05, 0.35, 0.05 ]
+    drop: 0.2
+    light: 6
+    socket: false
+  5:
+    name: "<#FF8C1A>Хэллоуин"
+    bulbs: [ JACK_O_LANTERN ]
+    size: 0.22
+    drop: 0.2
+    light: 10
+    socket: true
+
+config-version: 1 #не трогать!!!
