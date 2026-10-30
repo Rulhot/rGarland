@@ -18,7 +18,6 @@ public final class ReloadService {
     private final @NotNull GarlandService garlands;
 
     private final @NotNull AtomicBoolean reloading = new AtomicBoolean();
-    private final @NotNull AtomicBoolean restored = new AtomicBoolean();
 
     public void start() {
         load().thenAccept(result -> {
@@ -44,13 +43,18 @@ public final class ReloadService {
                 return;
             }
             scheduler.runGlobal(() -> {
-                config.apply(snapshot);
-                if (restored.compareAndSet(false, true)) {
-                    garlands.restore();
-                } else {
-                    garlands.rebuild();
+                try {
+                    config.apply(snapshot);
+                    if (garlands.isLoaded()) {
+                        garlands.rebuild();
+                    } else {
+                        garlands.restore();
+                    }
+                    finish(result, new Result.Success());
+                } catch (RuntimeException exception) {
+                    Logger.error("Не удалось применить конфигурацию", exception);
+                    finish(result, new Result.Failed());
                 }
-                finish(result, new Result.Success());
             });
         });
         return result;

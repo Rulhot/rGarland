@@ -16,6 +16,7 @@ give:
   usage: "{prefix} <white>Формат команды: <#FFD54A>/{command} give [игрок] [кол-во]"
   sender: "{prefix} <white>Игрок <#FFD54A>{player}</#FFD54A> получил гирлянду <gray>x{amount}"
   target: "{prefix} <white>Ты получил: {item} <gray>x{amount}<white>. Нажми ПКМ по блоку, чтобы повесить."
+  failed: "{prefix} <white>Игрок <#FFD54A>{player}</#FFD54A> вышел, гирлянда не выдана."
 
 reload:
   done: "{prefix} <white>Конфигурация перезагружена."
@@ -37,25 +38,26 @@ list:
 remove:
   usage: "{prefix} <white>Формат команды: <#FFD54A>/{command} remove [игрок] [номер]</#FFD54A>. Номер смотри в <#FFD54A>/{command} list"
   done: "{prefix} <white>Гирлянда <#FFD54A>{number}</#FFD54A> игрока <#FFD54A>{player}</#FFD54A> снята."
+  gone: "{prefix} <white>Эту гирлянду уже сняли. Проверь <#FFD54A>/{command} list</#FFD54A>."
+
 
 garland:
   no-permission: "<white>У тебя нет права вешать гирлянды."
   look-at-block: "<white>Наведи прицел на стену или блок."
   first-point: "<white>Начало стоит. <#FFD54A>ПКМ</#FFD54A> по второй точке, <#FFD54A>ЛКМ</#FFD54A> отменить."
   continue: "<white>Тянешь от этой точки. <#FFD54A>ПКМ</#FFD54A> по второй точке, <#FFD54A>ЛКМ</#FFD54A> отменить."
-  hung: "<white>Пролёт повешен. Снять его: <#FFD54A>Shift + ЛКМ</#FFD54A> по проводу."
+  hung: "<white>Пролёт повешен. Снять его: <#FFD54A>ПКМ ножницами</#FFD54A> по проводу."
   cancelled: "<white>Начало гирлянды отменено."
   taken-back: "<white>Пролёт снят, гирлянда вернулась в инвентарь."
   taken: "<white>Пролёт снят."
+  storage-error: "<white>Гирлянды сейчас недоступны: они ещё загружаются или файл с ними повреждён. Сообщи администрации."
   protected: "<white>Здесь чужая территория. Вешать гирлянду можно только там, где ты строишь."
+  too-far: "<white>Начало пролёта слишком далеко. Подойди ближе к нему."
+  through-block: "<white>Пролёт проходит сквозь блок. Выбери другую точку."
   too-close: "<white>Пролёт задевает другую гирлянду. Выбери точку дальше или под другим углом."
   bad-length: "{prefix} <white>Пролёт должен быть не длиннее <#FFD54A>{max}</#FFD54A> блоков. Выбери точку ближе."
-  limit: "{prefix} <white>У тебя уже <#FFD54A>{max}</#FFD54A> пролётов. Сними лишние через <#FFD54A>ЛКМ</#FFD54A> по точке."
-  removed: "<white>Снято пролётов: <#FFD54A>{count}</#FFD54A>"
-  nothing: "<white>Наведи прицел на светящуюся точку гирлянды, чтобы снять её."
-  palette: "<white>Лампы: {name} <dark_gray>»</dark_gray> <white>следующие через <#FFD54A>F</#FFD54A>"
+  limit: "{prefix} <white>У тебя уже <#FFD54A>{max}</#FFD54A> пролётов. Сними лишние: <#FFD54A>ПКМ ножницами</#FFD54A> по проводу."
   palette-applied: "<white>Гирлянда перекрашена: {name}"
-  mode: "<white>Мигание: {name} <dark_gray>»</dark_gray> <white>следующее через <#FFD54A>Shift + F</#FFD54A>"
   mode-applied: "<white>Мигание гирлянды: {name}"
 
 modes:

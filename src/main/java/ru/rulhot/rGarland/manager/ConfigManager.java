@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,6 +56,7 @@ public final class ConfigManager {
     private volatile @Nullable Snapshot snapshot;
     private volatile @NotNull Messages messages = Messages.EMPTY;
     private volatile @NotNull String command = Settings.Command.DEFAULT_NAME;
+    private final @NotNull Set<String> missingKeys = ConcurrentHashMap.newKeySet();
 
     public @Nullable Snapshot read() {
         ConfigFile settings = ConfigFile.load(plugin, Settings.FILE, Set.of());
@@ -67,7 +69,9 @@ public final class ConfigManager {
     }
 
     public void apply(@NotNull Snapshot loaded) {
+        Logger.setDebugEnabled(loaded.settings().debug());
         messages = loaded.messages();
+        missingKeys.clear();
         snapshot = loaded;
     }
 
@@ -78,6 +82,7 @@ public final class ConfigManager {
         }
         Settings parsed = parseSettings(file);
         command = parsed.command().name();
+        Logger.setDebugEnabled(parsed.debug());
         return parsed;
     }
 
@@ -85,6 +90,7 @@ public final class ConfigManager {
         return new Settings(
                 file.bool(Settings.METRICS, true),
                 file.bool(Settings.UPDATE_CHECK, true),
+                file.bool(Settings.DEBUG, false),
                 new Settings.Command(
                         file.string(Settings.Command.NAME, Settings.Command.DEFAULT_NAME),
                         file.stringList(Settings.Command.ALIASES, Settings.Command.DEFAULT_ALIASES)),
@@ -98,10 +104,6 @@ public final class ConfigManager {
                         file.integer(Settings.Performance.VIEWER_CHECK_TICKS, 20, 5, 200),
                         file.integer(Settings.Performance.PREVIEW_TICKS, 4, 1, 40),
                         file.integer(Settings.Performance.LIGHT_UPDATE_TICKS, 8, 2, 200)));
-    }
-
-    public boolean isReady() {
-        return snapshot != null;
     }
 
     public @Nullable GarlandSettings garland() {
@@ -120,8 +122,19 @@ public final class ConfigManager {
 
     public @NotNull Component message(@NotNull String key, @NotNull Map<String, ?> placeholders) {
         Messages current = messages;
-        String raw = current.raw(key).replace(COMMAND_TOKEN, command).replace(PREFIX_TOKEN, current.prefix());
+        String raw = raw(current, key).replace(COMMAND_TOKEN, command).replace(PREFIX_TOKEN, current.prefix());
         return MessageUtil.parseText(raw, placeholders);
+    }
+
+    private @NotNull String raw(@NotNull Messages current, @NotNull String key) {
+        String value = current.entries().get(key);
+        if (value != null) {
+            return value;
+        }
+        if (missingKeys.add(key)) {
+            Logger.warn("В " + MESSAGES_FILE + " нет ключа '" + key + "'");
+        }
+        return "";
     }
 
     public void send(@NotNull Audience audience, @NotNull String key) {
@@ -130,7 +143,7 @@ public final class ConfigManager {
 
     public void send(@NotNull Audience audience, @NotNull String key, @NotNull Map<String, ?> placeholders) {
         Messages current = messages;
-        String raw = current.raw(key).replace(COMMAND_TOKEN, command);
+        String raw = raw(current, key).replace(COMMAND_TOKEN, command);
         if (raw.isEmpty()) {
             return;
         }
@@ -150,7 +163,7 @@ public final class ConfigManager {
     }
 
     public void sendActionBar(@NotNull Audience audience, @NotNull String key, @NotNull Map<String, ?> placeholders) {
-        String raw = messages.raw(key).replace(COMMAND_TOKEN, command).replace(PREFIX_TOKEN, "");
+        String raw = raw(messages, key).replace(COMMAND_TOKEN, command).replace(PREFIX_TOKEN, "");
         if (!raw.isEmpty()) {
             audience.sendActionBar(MessageUtil.parseText(raw, placeholders));
         }
@@ -231,6 +244,11 @@ public final class ConfigManager {
                 file.bool(join(path, "socket"), true));
     }
 
+    private static @Nullable Material bulbMaterial(@NotNull String bulb) {
+        int state = bulb.indexOf(BLOCK_STATE_START);
+        return Material.matchMaterial(state < 0 ? bulb : bulb.substring(0, state));
+    }
+
     private static @NotNull List<String> bulbEntries(@NotNull ConfigFile file, @NotNull String path) {
         if (!file.isSection(path)) {
             return file.stringList(path, List.of());
@@ -264,7 +282,7 @@ public final class ConfigManager {
 
     private static @Nullable Boolean bulbKind(@NotNull String entry) {
         int state = entry.indexOf(BLOCK_STATE_START);
-        Material material = Material.matchMaterial(state < 0 ? entry : entry.substring(0, state));
+        Material material = bulbMaterial(entry);
         if (material == null) {
             return null;
         }
@@ -327,15 +345,6 @@ public final class ConfigManager {
 
         public Messages {
             entries = Map.copyOf(entries);
-        }
-
-        private @NotNull String raw(@NotNull String key) {
-            String value = entries.get(key);
-            if (value == null) {
-                Logger.warn("В messages.yml нет ключа '" + key + "'");
-                return "";
-            }
-            return value;
         }
     }
 }

@@ -4,6 +4,7 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBlockChange;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.data.Levelled;
@@ -22,6 +23,8 @@ public final class PacketLight {
     private static final int CHUNK_SHIFT = 4;
     private static final int MAX_LEVEL = 15;
     private static final int @NotNull [] LIGHT_IDS = new int[MAX_LEVEL + 1];
+    private static final int AIR_ID = SpigotConversionUtil.fromBukkitBlockData(Material.AIR.createBlockData())
+            .getGlobalId();
 
     static {
         Levelled light = (Levelled) Material.LIGHT.createBlockData();
@@ -110,18 +113,21 @@ public final class PacketLight {
         boolean[] air = new boolean[positions.size()];
         for (int i = 0; i < positions.size(); i++) {
             Vector3i position = positions.get(i);
-            air[i] = loaded(position) && world.getBlockAt(position.x, position.y, position.z).getType().isAir();
+            air[i] = readable(position) && world.getBlockAt(position.x, position.y, position.z).getType().isAir();
         }
         return air;
     }
 
     private void restore(@NotNull User viewer) {
         try {
-            for (Vector3i position : positions) {
-                if (loaded(position)) {
+            for (int i = 0; i < positions.size(); i++) {
+                Vector3i position = positions.get(i);
+                if (readable(position)) {
                     int real = SpigotConversionUtil.fromBukkitBlockData(
                             world.getBlockData(position.x, position.y, position.z)).getGlobalId();
                     viewer.writePacket(new WrapperPlayServerBlockChange(position, real));
+                } else if (air[i]) {
+                    viewer.writePacket(new WrapperPlayServerBlockChange(position, AIR_ID));
                 }
             }
             viewer.flushPackets();
@@ -130,7 +136,9 @@ public final class PacketLight {
         }
     }
 
-    private boolean loaded(@NotNull Vector3i position) {
-        return world.isChunkLoaded(position.x >> CHUNK_SHIFT, position.z >> CHUNK_SHIFT);
+    private boolean readable(@NotNull Vector3i position) {
+        int chunkX = position.x >> CHUNK_SHIFT;
+        int chunkZ = position.z >> CHUNK_SHIFT;
+        return Bukkit.isOwnedByCurrentRegion(world, chunkX, chunkZ) && world.isChunkLoaded(chunkX, chunkZ);
     }
 }

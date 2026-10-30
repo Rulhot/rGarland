@@ -14,6 +14,7 @@ import ru.rulhot.rGarland.command.SubCommand;
 import ru.rulhot.rGarland.manager.ConfigManager;
 import ru.rulhot.rGarland.model.GarlandSpan;
 import ru.rulhot.rGarland.service.GarlandService;
+import ru.rulhot.rGarland.util.logger.Logger;
 
 import java.util.List;
 import java.util.Map;
@@ -54,6 +55,10 @@ public final class RemoveSubCommand implements SubCommand {
 
     private int remove(@NotNull CommandContext<CommandSourceStack> context) {
         CommandSender sender = context.getSource().getSender();
+        if (!garlands.isLoaded()) {
+            config.send(sender, "not-ready");
+            return Command.SINGLE_SUCCESS;
+        }
         String name = StringArgumentType.getString(context, PLAYER);
         UUID owner = SubCommand.owner(garlands, name);
         List<GarlandSpan> spans = owner == null ? List.of() : garlands.spans(owner);
@@ -66,9 +71,15 @@ public final class RemoveSubCommand implements SubCommand {
             config.send(sender, "invalid-number", Map.of("value", number, "max", spans.size()));
             return Command.SINGLE_SUCCESS;
         }
-        if (garlands.remove(spans.get(number - 1))) {
-            config.send(sender, "remove.done", Map.of("player", SubCommand.name(garlands, owner), "number", number));
+        GarlandSpan span = spans.get(number - 1);
+        String ownerName = SubCommand.name(garlands, owner);
+        if (!garlands.remove(span)) {
+            config.send(sender, "remove.gone");
+            return Command.SINGLE_SUCCESS;
         }
+        Logger.info(sender.getName() + " снял командой гирлянду " + number + " игрока " + ownerName + " в мире "
+                + span.world());
+        config.send(sender, "remove.done", Map.of("player", ownerName, "number", number));
         return Command.SINGLE_SUCCESS;
     }
 }

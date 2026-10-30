@@ -8,6 +8,7 @@ import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBundle;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
 import lombok.RequiredArgsConstructor;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -45,6 +46,9 @@ public final class DisplayEffects {
         double farSquared = farRadius * farRadius;
         double nearSquared = nearRadius * nearRadius;
         for (Player player : center.getWorld().getPlayers()) {
+            if (!Bukkit.isOwnedByCurrentRegion(player)) {
+                continue;
+            }
             double distance = player.getLocation().distanceSquared(center);
             if (distance > farSquared) {
                 continue;

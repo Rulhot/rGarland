@@ -8,12 +8,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
-public record Settings(boolean metrics, boolean updateCheck, @NotNull Command command,
+public record Settings(boolean metrics, boolean updateCheck, boolean debug, @NotNull Command command,
                        @NotNull Performance performance) {
 
     public static final @NotNull String METRICS = "settings.metrics";
     public static final @NotNull String UPDATE_CHECK = "settings.update-check";
-    public static final @NotNull Settings DEFAULT = new Settings(true, true, Command.DEFAULT, Performance.DEFAULT);
+    public static final @NotNull String DEBUG = "settings.debug";
+    public static final @NotNull Settings DEFAULT = new Settings(true, true, false, Command.DEFAULT,
+            Performance.DEFAULT);
 
     public static final @NotNull String FILE = "config.yml";
 

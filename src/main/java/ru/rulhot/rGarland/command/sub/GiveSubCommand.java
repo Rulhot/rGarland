@@ -19,6 +19,7 @@ import ru.rulhot.rGarland.model.GarlandSettings;
 import ru.rulhot.rGarland.service.ItemService;
 import ru.rulhot.rGarland.service.PreviewService;
 import ru.rulhot.rGarland.util.SchedulerUtil;
+import ru.rulhot.rGarland.util.logger.Logger;
 
 import java.util.Map;
 
@@ -66,14 +67,16 @@ public final class GiveSubCommand implements SubCommand {
             config.send(sender, "player-not-found", Map.of("player", name));
             return Command.SINGLE_SUCCESS;
         }
+        String targetName = target.getName();
         scheduler.runFor(target, () -> {
             ItemStack item = items.create(settings.item(), amount);
             target.getInventory().addItem(item).values()
                     .forEach(leftover -> target.getWorld().dropItemNaturally(target.getLocation(), leftover));
             config.send(target, "give.target", Map.of("item", item.effectiveName(), "amount", amount));
             previews.watch(target);
-        });
-        config.send(sender, "give.sender", Map.of("player", target.getName(), "amount", amount));
+            config.send(sender, "give.sender", Map.of("player", targetName, "amount", amount));
+            Logger.info(sender.getName() + " выдал " + targetName + " гирлянды, " + amount + " шт.");
+        }, () -> config.send(sender, "give.failed", Map.of("player", targetName)));
         return Command.SINGLE_SUCCESS;
     }
 }

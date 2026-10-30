@@ -47,7 +47,7 @@ public final class GarlandPreview {
     private @Nullable Location ghostTo;
     private boolean ghostTooLong;
 
-    public void update(@NotNull GarlandSettings settings, @NotNull Settings.Performance view,
+    public void update(@NotNull GarlandSettings settings, @NotNull Settings.Performance view, double maxLength,
                        @NotNull List<Location> nodes, @Nullable Location hover, @Nullable Location from,
                        @Nullable Location to, @Nullable GarlandPiece.Style style, boolean tooLong) {
         List<DisplayEffects.Update> updates = new ArrayList<>();
@@ -55,7 +55,7 @@ public final class GarlandPreview {
         if (from == null || to == null || style == null) {
             disposeGhost();
         } else {
-            updateGhost(settings, view, from, to, style, tooLong, updates);
+            updateGhost(settings, view, maxLength, from, to, style, tooLong, updates);
         }
         effects.send(List.of(viewer), updates);
     }
@@ -110,13 +110,13 @@ public final class GarlandPreview {
                 PacketDisplay.glowing(hover ? MARKER_HOVER_COLOR : MARKER_COLOR));
     }
 
-    private void updateGhost(@NotNull GarlandSettings settings, @NotNull Settings.Performance view,
+    private void updateGhost(@NotNull GarlandSettings settings, @NotNull Settings.Performance view, double maxLength,
                              @NotNull Location from, @NotNull Location to, @NotNull GarlandPiece.Style style,
                              boolean tooLong, @NotNull List<DisplayEffects.Update> updates) {
         Ghost current = ghost;
         if (current == null || !current.from().equals(from) || !current.style().equals(style)) {
             disposeGhost();
-            current = spawnGhost(settings, view, from, style);
+            current = spawnGhost(settings, view, maxLength, from, style);
             ghost = current;
         } else if (to.equals(ghostTo) && tooLong == ghostTooLong) {
             return;
@@ -166,7 +166,7 @@ public final class GarlandPreview {
     }
 
     private @NotNull Ghost spawnGhost(@NotNull GarlandSettings settings, @NotNull Settings.Performance view,
-                                      @NotNull Location from, @NotNull GarlandPiece.Style style) {
+                                      double maxLength, @NotNull Location from, @NotNull GarlandPiece.Style style) {
         List<PacketDisplay> wires = new ArrayList<>(SEGMENTS);
         for (int i = 0; i < SEGMENTS; i++) {
             wires.add(effects.spawn(EntityTypes.BLOCK_DISPLAY, List.of(viewer), from, List.of(
@@ -177,7 +177,7 @@ public final class GarlandPreview {
         }
         GarlandSettings.Palette palette = style.palette();
         EntityType type = palette.blocks() ? EntityTypes.BLOCK_DISPLAY : EntityTypes.ITEM_DISPLAY;
-        int max = Math.clamp((int) Math.floor(settings.maxLength() / view.bulbSpacing()), 1, MAX_BULBS);
+        int max = Math.clamp((int) Math.floor(maxLength / view.bulbSpacing()), 1, MAX_BULBS);
         List<PacketDisplay> bulbs = new ArrayList<>(max);
         for (int i = 0; i < max; i++) {
             List<EntityData<?>> state = new ArrayList<>(List.of(

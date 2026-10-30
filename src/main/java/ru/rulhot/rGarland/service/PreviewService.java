@@ -11,6 +11,7 @@ import ru.rulhot.rGarland.display.GarlandPreview;
 import ru.rulhot.rGarland.manager.ConfigManager;
 import ru.rulhot.rGarland.util.SchedulerUtil;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,13 +25,15 @@ public final class PreviewService {
     private final @NotNull ItemService items;
     private final @NotNull GarlandService garlands;
     private final @NotNull Set<UUID> watched = ConcurrentHashMap.newKeySet();
+    private final @NotNull Map<UUID, SchedulerUtil.Task> tasks = new ConcurrentHashMap<>();
 
     public void watch(@NotNull Player player) {
-        if (!watched.add(player.getUniqueId())) {
+        UUID playerId = player.getUniqueId();
+        if (!watched.add(playerId)) {
             return;
         }
         @Nullable GarlandPreview[] preview = {null};
-        scheduler.runForWhile(player, () -> {
+        SchedulerUtil.Task task = scheduler.runForWhile(player, () -> {
             if (!player.isValid() || !items.isGarland(player.getInventory().getItemInMainHand())) {
                 return false;
             }
@@ -47,7 +50,17 @@ public final class PreviewService {
             if (preview[0] != null) {
                 preview[0].clear();
             }
-            watched.remove(player.getUniqueId());
+            tasks.remove(playerId);
+            watched.remove(playerId);
         }, 1, config.performance().previewTicks());
+        if (task != null && watched.contains(playerId)) {
+            tasks.put(playerId, task);
+        }
+    }
+
+    public void shutdown() {
+        tasks.values().forEach(SchedulerUtil.Task::cancel);
+        tasks.clear();
+        watched.clear();
     }
 }

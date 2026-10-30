@@ -1,5 +1,7 @@
 package ru.rulhot.rGarland;
 
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
@@ -49,10 +51,16 @@ public final class RGarland extends JavaPlugin {
     private @Nullable Metrics metrics;
     private @Nullable DisplayEffects effects;
     private @Nullable GarlandService garlands;
+    private @Nullable PreviewService previews;
 
     @Override
     public void onEnable() {
         Logger.setup(this);
+        if (PacketEvents.getAPI().getServerManager().getVersion() == ServerVersion.ERROR) {
+            Logger.error("PacketEvents не знает версию этого сервера, гирлянды не будут работать. Обнови PacketEvents");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
         SchedulerUtil scheduler = new SchedulerUtil(this);
 
         ConfigManager config = new ConfigManager(this);
@@ -74,6 +82,7 @@ public final class RGarland extends JavaPlugin {
         pluginManager.registerEvents(new ItemProtectionListener(items), this);
         pluginManager.registerEvents(new ViewerListener(effects), this);
         PreviewService previews = new PreviewService(scheduler, config, effects, items, garlands);
+        this.previews = previews;
         pluginManager.registerEvents(new PreviewListener(previews), this);
 
         GarlandCommand command = new GarlandCommand(config, List.of(
@@ -83,7 +92,7 @@ public final class RGarland extends JavaPlugin {
                 new RemoveSubCommand(config, garlands),
                 new ReloadSubCommand(config, reloads, scheduler)));
         Settings startup = config.readStartup();
-        if (startup.metrics() && BSTATS_ID > 0) {
+        if (startup.metrics()) {
             metrics = new Metrics(this, BSTATS_ID);
         }
         if (startup.updateCheck()) {
@@ -133,6 +142,11 @@ public final class RGarland extends JavaPlugin {
         metrics = null;
         if (currentMetrics != null) {
             currentMetrics.shutdown();
+        }
+        PreviewService currentPreviews = previews;
+        previews = null;
+        if (currentPreviews != null) {
+            currentPreviews.shutdown();
         }
         GarlandService currentGarlands = garlands;
         garlands = null;

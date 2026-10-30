@@ -61,14 +61,14 @@ public final class GarlandPiece {
         }
     }
 
-    private static class Part {
+    private abstract static sealed class Part permits Block, Bulb {
 
-        protected final @NotNull PacketDisplay display;
-        protected final @NotNull Location location;
-        protected final @NotNull Vector3f translation;
-        protected final @NotNull Quaternionf rotation;
-        protected final @NotNull Vector3f relative;
-        protected final boolean detail;
+        final @NotNull PacketDisplay display;
+        final @NotNull Location location;
+        final @NotNull Vector3f translation;
+        final @NotNull Quaternionf rotation;
+        final @NotNull Vector3f relative;
+        final boolean detail;
 
         private Part(@NotNull PacketDisplay display, @NotNull Location location, @NotNull Location anchor,
                      @NotNull Vector3f translation, @NotNull Quaternionf rotation, boolean detail) {
@@ -177,10 +177,6 @@ public final class GarlandPiece {
         removed = true;
     }
 
-    public void dispose() {
-        discard();
-    }
-
     public static @NotNull Vector3f curve(@NotNull Location from, @NotNull Location to, double t) {
         double horizontal = Math.hypot(to.getX() - from.getX(), to.getZ() - from.getZ());
         double sag = Math.min(MAX_SAG, BASE_SAG + horizontal * SAG);
@@ -212,7 +208,7 @@ public final class GarlandPiece {
                 : new Vector3f();
     }
 
-    static int bulbCount(double length, double spacing) {
+    public static int bulbCount(double length, double spacing) {
         return Math.max(1, (int) Math.floor(Math.max(0, length - END_GAP * 2) / spacing));
     }
 

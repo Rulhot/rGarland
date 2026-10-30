@@ -10,9 +10,21 @@ import ru.rulhot.rGarland.util.logger.impl.LegacyLogger;
 public class Logger {
 
     private volatile @Nullable ILogger delegate;
+    private volatile boolean debugEnabled;
 
     public void setup(@NotNull Plugin plugin) {
         delegate = new LegacyLogger(plugin.getComponentLogger());
+    }
+
+    public void setDebugEnabled(boolean enabled) {
+        debugEnabled = enabled;
+    }
+
+    public void debug(@NotNull String message) {
+        ILogger current = delegate;
+        if (debugEnabled && current != null) {
+            current.debug(message);
+        }
     }
 
     public void info(@NotNull String message) {

@@ -12,6 +12,11 @@ public final class LegacyLogger implements ILogger {
     private final @NotNull ComponentLogger logger;
 
     @Override
+    public void debug(@NotNull String message) {
+        logger.info(Component.text("[debug] " + message));
+    }
+
+    @Override
     public void info(@NotNull String message) {
         logger.info(Component.text(message));
     }

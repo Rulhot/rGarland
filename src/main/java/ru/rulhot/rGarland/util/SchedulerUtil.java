@@ -7,8 +7,10 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ru.rulhot.rGarland.util.logger.Logger;
 
+import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 
 @RequiredArgsConstructor
@@ -16,8 +18,20 @@ public final class SchedulerUtil {
 
     private final @NotNull Plugin plugin;
 
+    public record Task(@NotNull ScheduledTask handle) {
+
+        public void cancel() {
+            handle.cancel();
+        }
+    }
+
     public void runAsync(@NotNull Runnable task) {
         Bukkit.getAsyncScheduler().runNow(plugin, handle -> guarded(task));
+    }
+
+    public void runAsyncLater(@NotNull Runnable task, long delayMillis) {
+        Bukkit.getAsyncScheduler().runDelayed(plugin, handle -> guarded(task), Math.max(1L, delayMillis),
+                TimeUnit.MILLISECONDS);
     }
 
     public void runGlobal(@NotNull Runnable task) {
@@ -28,8 +42,14 @@ public final class SchedulerUtil {
         entity.getScheduler().run(plugin, handle -> guarded(task), null);
     }
 
-    public void runForWhile(@NotNull Entity entity, @NotNull BooleanSupplier step, @NotNull Runnable finished,
-                            long delayTicks, long periodTicks) {
+    public void runFor(@NotNull Entity entity, @NotNull Runnable task, @NotNull Runnable retired) {
+        if (entity.getScheduler().run(plugin, handle -> guarded(task), () -> guarded(retired)) == null) {
+            guarded(retired);
+        }
+    }
+
+    public @Nullable Task runForWhile(@NotNull Entity entity, @NotNull BooleanSupplier step,
+                                      @NotNull Runnable finished, long delayTicks, long periodTicks) {
         ScheduledTask handle = entity.getScheduler().runAtFixedRate(plugin, task -> {
             if (keepRunning(step)) {
                 return;
@@ -39,7 +59,9 @@ public final class SchedulerUtil {
         }, () -> guarded(finished), ticks(delayTicks), ticks(periodTicks));
         if (handle == null) {
             guarded(finished);
+            return null;
         }
+        return new Task(handle);
     }
 
     public void runAt(@NotNull Location location, @NotNull Runnable task) {
